@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>DSA Task Manager</title>
+
+<style>
+
+body{
+font-family:Arial;
+background:#f2f2f2;
+text-align:center;
+}
+
+.container{
+background:white;
+padding:20px;
+width:400px;
+margin:auto;
+border-radius:10px;
+}
+
+input,select,button{
+padding:8px;
+margin:5px;
+}
+
+ul{
+list-style:none;
+padding:0;
+}
+
+li{
+background:#ddd;
+margin:5px;
+padding:8px;
+border-radius:5px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h2>DSA Task Manager</h2>
+
+<div class="container">
+
+<input type="text" id="taskInput" placeholder="Enter Task">
+
+<select id="priority">
+<option value="1">High</option>
+<option value="2">Medium</option>
+<option value="3">Low</option>
+</select>
+
+<br>
+
+<button onclick="addTask()">Add Task</button>
+<button onclick="completeTask()">Complete Task</button>
+
+<h3>Tasks</h3>
+<ul id="taskList"></ul>
+
+<h3>Completed Tasks (Stack)</h3>
+<ul id="completedList"></ul>
+
+</div>
+
+<script>
+
+/* Linked List */
+
+class Node{
+constructor(task,priority){
+this.task=task
+this.priority=priority
+this.next=null
+}
+}
+
+class LinkedList{
+
+constructor(){
+this.head=null
+}
+
+add(task,priority){
+
+let newNode=new Node(task,priority)
+
+if(!this.head){
+this.head=newNode
+return
+}
+
+let temp=this.head
+
+while(temp.next){
+temp=temp.next
+}
+
+temp.next=newNode
+}
+
+getAll(){
+
+let tasks=[]
+let temp=this.head
+
+while(temp){
+tasks.push(temp)
+temp=temp.next
+}
+
+return tasks
+}
+
+}
+
+/* Queue */
+
+class Queue{
+
+constructor(){
+this.items=[]
+}
+
+enqueue(x){
+this.items.push(x)
+}
+
+dequeue(){
+return this.items.shift()
+}
+
+}
+
+/* Stack */
+
+class Stack{
+
+constructor(){
+this.items=[]
+}
+
+push(x){
+this.items.push(x)
+}
+
+pop(){
+return this.items.pop()
+}
+
+remove(index){
+this.items.splice(index,1)
+}
+
+getAll(){
+return this.items
+}
+
+}
+
+/* Priority Queue */
+
+class PriorityQueue{
+
+constructor(){
+this.items=[]
+}
+
+enqueue(task){
+
+this.items.push(task)
+
+this.items.sort((a,b)=>a.priority-b.priority)
+
+}
+
+getAll(){
+return this.items
+}
+
+}
+
+/* Objects */
+
+let list=new LinkedList()
+let queue=new Queue()
+let stack=new Stack()
+let pq=new PriorityQueue()
+
+/* Add Task */
+
+function addTask(){
+
+let task=document.getElementById("taskInput").value
+let priority=parseInt(document.getElementById("priority").value)
+
+if(task==""){
+alert("Enter task")
+return
+}
+
+list.add(task,priority)
+
+let obj={task:task,priority:priority}
+
+queue.enqueue(obj)
+pq.enqueue(obj)
+
+document.getElementById("taskInput").value=""
+
+display()
+
+}
+
+/* Complete Task */
+
+function completeTask(){
+
+let t=queue.dequeue()
+
+if(!t){
+alert("No tasks")
+return
+}
+
+stack.push(t)
+
+display()
+
+}
+
+/* Delete Completed Task */
+
+function deleteTask(index){
+
+stack.remove(index)
+
+display()
+
+}
+
+/* Display Tasks */
+
+function display(){
+
+let tasks=pq.getAll()
+
+let taskList=document.getElementById("taskList")
+taskList.innerHTML=""
+
+tasks.forEach(t=>{
+
+let li=document.createElement("li")
+li.innerText=t.task+" (Priority "+t.priority+")"
+taskList.appendChild(li)
+
+})
+
+let completed=document.getElementById("completedList")
+completed.innerHTML=""
+
+stack.getAll().forEach((t,index)=>{
+
+let li=document.createElement("li")
+
+li.innerText=t.task+" "
+
+let btn=document.createElement("button")
+btn.innerText="Delete"
+btn.onclick=function(){
+deleteTask(index)
+}
+
+li.appendChild(btn)
+
+completed.appendChild(li)
+
+})
+
+}
+
+</script>
+
+</body>
+
+</html>
